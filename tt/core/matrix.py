@@ -31,7 +31,7 @@ class matrix(object):
             return
 
         if isinstance(a, _np.ndarray):
-            d = a.ndim / 2
+            d = a.ndim // 2
             p = a.shape
             self.n = _np.array(p[:d], dtype=_np.int32)
             self.m = _np.array(p[d:], dtype=_np.int32)
@@ -179,7 +179,7 @@ class matrix(object):
                 crs = []
                 for i in range(self.tt.d):
                     crs.append(mycrs[i][:, row % self.n[i], :, :].copy())
-                    row /= self.n[i]
+                    row //= self.n[i]
                 return _vector.vector.from_list(crs)
             elif isinstance(index[1], int) and index[0] == slice(None):
                 # col requested
@@ -188,7 +188,7 @@ class matrix(object):
                 crs = []
                 for i in range(self.tt.d):
                     crs.append(mycrs[i][:, :, col % self.m[i], :].copy())
-                    col /= self.m[i]
+                    col //= self.m[i]
                 return _vector.vector.from_list(crs)
             elif isinstance(index[0], int) and isinstance(index[1], int):
                 # element requested

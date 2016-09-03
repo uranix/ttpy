@@ -315,7 +315,7 @@ def Toeplitz(x, d=None, D=None, kind='F'):
     # checking for arguments consistency
     def check_kinds(D, kind):
         if D % len(kind) == 0:
-            kind.extend(kind * (D / len(kind) - 1))
+            kind.extend(kind * (D // len(kind) - 1))
         if len(kind) != D:
             raise ValueError(
                 "Must give proper amount of _matrix kinds (one or D, for example)")
@@ -330,15 +330,15 @@ def Toeplitz(x, d=None, D=None, kind='F'):
             raise ValueError(
                 "x.d must be divisible by D when d is not specified!")
         if len(kind) == 1:
-            d = _np.array([x.d / D - (1 if kind[0] == 'F' else 0)]
+            d = _np.array([x.d // D - (1 if kind[0] == 'F' else 0)]
                           * D, dtype=_np.int32)
             kind = kind * D
         else:
             check_kinds(D, kind)
             if set(kind).issubset(['F']):
-                d = _np.array([x.d / D - 1] * D, dtype=_np.int32)
+                d = _np.array([x.d // D - 1] * D, dtype=_np.int32)
             elif set(kind).issubset(['C', 'L', 'U']):
-                d = _np.array([x.d / D] * D, dtype=_np.int32)
+                d = _np.array([x.d // D] * D, dtype=_np.int32)
             else:
                 raise ValueError(
                     "Only similar _matrix kinds (only F or only C, L and U) are accepted when d is not specified!")
@@ -647,7 +647,7 @@ def delta(n, d=None, center=0):
         cind = []
         for i in range(d):
             cind.append(center % n0[i])
-            center /= n0[i]
+            center //= n0[i]
         if center > 0:
             cind = [0] * d
     cr = []
@@ -688,7 +688,7 @@ def stepfun(n, d=None, center=1, direction=1):
     cind = []
     for i in range(d):
         cind.append(center % n0[i])
-        center /= n0[i]
+        center //= n0[i]
 
     def gen_notx(currcind, currn):
         return [0.0] * (currn - currcind) + [1.0] * currcind
@@ -774,7 +774,7 @@ def unit(n, d=None, j=None, tt_instance=True):
     if isinstance(n, int):
         if d is None:
             d = 1
-        n = n * _np.ones(d)
+        n = n * _np.ones(d, dtype=int)
     else:
         d = len(n)
     if j is None:
@@ -896,7 +896,7 @@ def reshape(tt_array, shape, eps=1e-14, rl=1, rr=1):
                 if i2 > d2:
                     break
             if n2[i2] % n1[i1] == 0:
-                n2[i2] = n2[i2] / n1[i1]
+                n2[i2] = n2[i2] // n1[i1]
             else:
                 needQRs = True
                 break
@@ -959,12 +959,12 @@ def reshape(tt_array, shape, eps=1e-14, rl=1, rr=1):
                 # Update the "matrix" sizes
                 n2_n[i2] = n2_n[i2] * n1_n[i1]
                 n2_m[i2] = n2_m[i2] * n1_m[i1]
-                restn2_n[i2] = restn2_n[i2] / n1_n[i1]
-                restn2_m[i2] = restn2_m[i2] / n1_m[i1]
+                restn2_n[i2] = restn2_n[i2] // n1_n[i1]
+                restn2_m[i2] = restn2_m[i2] // n1_m[i1]
             r2[i2 + 1] = r1[i1 + 1]
             # Update the sizes of tt2
             n2[i2] = n2[i2] * n1[i1]
-            restn2[i2] = restn2[i2] / n1[i1]
+            restn2[i2] = restn2[i2] // n1[i1]
             curcr2 = _np.reshape(
                 curcr2, (r2[i2] * n2[i2], r2[i2 + 1]), order='F')
             i1 = i1 + 1  # current core1 is over
@@ -980,22 +980,22 @@ def reshape(tt_array, shape, eps=1e-14, rl=1, rr=1):
                     curcr1 = _np.reshape(curcr1,
                                          (r1[i1],
                                           n12_n,
-                                          n1_n[i1] / n12_n,
+                                          n1_n[i1] // n12_n,
                                              n12_m,
-                                             n1_m[i1] / n12_m,
+                                             n1_m[i1] // n12_m,
                                              r1[i1 + 1]),
                                          order='F')
                     curcr1 = _np.transpose(curcr1, [0, 1, 3, 2, 4, 5])
                     # Update the _matrix sizes of tt2 and tt1
                     n2_n[i2] = n2_n[i2] * n12_n
                     n2_m[i2] = n2_m[i2] * n12_m
-                    restn2_n[i2] = restn2_n[i2] / n12_n
-                    restn2_m[i2] = restn2_m[i2] / n12_m
-                    n1_n[i1] = n1_n[i1] / n12_n
-                    n1_m[i1] = n1_m[i1] / n12_m
+                    restn2_n[i2] = restn2_n[i2] // n12_n
+                    restn2_m[i2] = restn2_m[i2] // n12_m
+                    n1_n[i1] = n1_n[i1] // n12_n
+                    n1_m[i1] = n1_m[i1] // n12_m
 
                 curcr1 = _np.reshape(
-                    curcr1, (r1[i1] * n12, (n1[i1] / n12) * r1[i1 + 1]), order='F')
+                    curcr1, (r1[i1] * n12, (n1[i1] // n12) * r1[i1 + 1]), order='F')
                 [u, s, v] = _np.linalg.svd(curcr1, full_matrices=False)
                 r = _my_chop2(s, eps * _np.linalg.norm(s) / (d2 - 1)**0.5)
                 u = u[:, :r]
@@ -1007,12 +1007,12 @@ def reshape(tt_array, shape, eps=1e-14, rl=1, rr=1):
                 r2[i2 + 1] = r
                 # Update the sizes of tt2
                 n2[i2] = n2[i2] * n12
-                restn2[i2] = restn2[i2] / n12
+                restn2[i2] = restn2[i2] // n12
                 curcr2 = _np.reshape(
                     curcr2, (r2[i2] * n2[i2], r2[i2 + 1]), order='F')
                 r1[i1] = r
                 # and tt1
-                n1[i1] = n1[i1] / n12
+                n1[i1] = n1[i1] // n12
                 # keep v in tt1 for next operations
                 curcr1 = _np.reshape(
                     v.T, (r1[i1], n1[i1], r1[i1 + 1]), order='F')
@@ -1070,8 +1070,8 @@ def reshape(tt_array, shape, eps=1e-14, rl=1, rr=1):
     tt2.core = core2
     tt2.ps = _np.cumsum(_np.concatenate((_np.ones(1), r2[:-1] * n2 * r2[1:])))
 
-    tt2.n[0] = tt2.n[0] / rl
-    tt2.n[d2 - 1] = tt2.n[d2 - 1] / rr
+    tt2.n[0] = tt2.n[0] // rl
+    tt2.n[d2 - 1] = tt2.n[d2 - 1] // rr
     tt2.r[0] = rl
     tt2.r[d2] = rr
 

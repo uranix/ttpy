@@ -1,5 +1,5 @@
 import numpy as _np
-import fractions as _fractions
+import math as _math
 
 # Available functions:
 # ind2sub, gcd, my_chop2
@@ -18,13 +18,13 @@ def ind2sub(siz, idx):
     k = _np.cumprod(siz[:-1])
     k = _np.concatenate((_np.ones(1), k))
     for i in range(n - 1, -1, -1):
-        subs[i] = _np.floor(idx / k[i])
+        subs[i] = idx // k[i]
         idx = idx % k[i]
     return subs
-    
+
 def gcd(a, b):
     '''Greatest common divider'''
-    f = _np.frompyfunc(_fractions.gcd, 2, 1)
+    f = _np.frompyfunc(_math.gcd, 2, 1)
     return f(a, b)
 
 def my_chop2(sv, eps):  # from ttpy/multifuncr.py
