@@ -17,7 +17,7 @@ def ind2sub(siz, idx):
     subs = _np.empty((n))
     k = _np.cumprod(siz[:-1])
     k = _np.concatenate((_np.ones(1), k))
-    for i in xrange(n - 1, -1, -1):
+    for i in range(n - 1, -1, -1):
         subs[i] = _np.floor(idx / k[i])
         idx = idx % k[i]
     return subs

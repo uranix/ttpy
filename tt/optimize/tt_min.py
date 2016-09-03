@@ -51,8 +51,8 @@ def min_func(fun, bounds_min, bounds_max, d=None, rmax=10,
     fun_evals = 0
 
     grid = [np.reshape(np.linspace(a[i], b[i], n[i]), (n[i], 1))
-            for i in xrange(d)]
-    for i in xrange(d - 1):
+            for i in range(d)]
+    for i in range(d - 1):
         #cr1 = y[i]
         ry[i + 1] = min(ry[i + 1], n[i] * ry[i])
         cr1 = np.random.randn(ry[i], n[i], ry[i + 1])
@@ -102,7 +102,7 @@ def min_func(fun, bounds_min, bounds_max, d=None, rmax=10,
             x_full = J[ind_cur, :]
             val = fun(x_full)
             if verb:
-                print 'New record:', val, 'Point:', x_full, 'fevals:', fun_evals
+                print('New record:', val, 'Point:', x_full, 'fevals:', fun_evals)
         cry = smooth_fun(cry, lm)
         if (dirn < 0 and i > 0):
             cry = reshape(cry, (ry[i], n[i] * ry[i + 1]))
@@ -163,8 +163,8 @@ def min_tens(tens, rmax=10, nswp=10, verb=True, smooth_fun=None):
     cores = tt.tensor.to_list(tens)
 
     # Fill initial multiindex J randomly.
-    grid = [np.reshape(range(n[i]), (n[i], 1)) for i in xrange(d)]
-    for i in xrange(d - 1):
+    grid = [np.reshape(list(range(n[i])), (n[i], 1)) for i in range(d)]
+    for i in range(d - 1):
         ry[i + 1] = min(ry[i + 1], n[i] * ry[i])
         ind = sorted(np.random.permutation(ry[i] * n[i])[0:ry[i + 1]])
         w1 = mkron(np.ones((n[i], 1)), Jy[i])
@@ -213,7 +213,7 @@ def min_tens(tens, rmax=10, nswp=10, verb=True, smooth_fun=None):
             x_full = J[ind_cur, :]
             val = tens[x_full]
             if verb:
-                print 'New record:', val, 'Point:', x_full, 'elements seen:', elements_seen
+                print('New record:', val, 'Point:', x_full, 'elements seen:', elements_seen)
         cry = smooth_fun(cry, lm)
         if dirn < 0 and i > 0:
             cry = reshape(cry, (ry[i], n[i] * ry[i + 1]))

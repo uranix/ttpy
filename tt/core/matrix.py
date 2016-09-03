@@ -1,9 +1,9 @@
 import numpy as _np
 from numbers import Number as _Number
-import core_f90 as _core_f90
-import vector as _vector
+from . import core_f90 as _core_f90
+from . import vector as _vector
 
-import tools as _tools
+from . import tools as _tools
 
 
 class matrix(object):
@@ -58,7 +58,7 @@ class matrix(object):
         r = _np.zeros(d + 1, dtype=_np.int32)
         m = _np.zeros(d, dtype=_np.int32)
         cr = _np.array([])
-        for i in xrange(d):
+        for i in range(d):
             cr = _np.concatenate((cr, a[i].flatten('F')))
             r[i] = a[i].shape[0]
             r[i + 1] = a[i].shape[3]
@@ -85,7 +85,7 @@ class matrix(object):
         ps = tt.ps
         core = tt.core
         res = []
-        for i in xrange(d):
+        for i in range(d):
             cur_core = core[ps[i] - 1:ps[i + 1] - 1]
             cur_core = cur_core.reshape(
                 (r[i], n[i], m[i], r[i + 1]), order='F')
@@ -177,7 +177,7 @@ class matrix(object):
                 row = index[0]
                 mycrs = matrix.to_list(self)
                 crs = []
-                for i in xrange(self.tt.d):
+                for i in range(self.tt.d):
                     crs.append(mycrs[i][:, row % self.n[i], :, :].copy())
                     row /= self.n[i]
                 return _vector.vector.from_list(crs)
@@ -186,7 +186,7 @@ class matrix(object):
                 col = index[1]
                 mycrs = matrix.to_list(self)
                 crs = []
-                for i in xrange(self.tt.d):
+                for i in range(self.tt.d):
                     crs.append(mycrs[i][:, :, col % self.m[i], :].copy())
                     col /= self.m[i]
                 return _vector.vector.from_list(crs)
@@ -332,13 +332,13 @@ class matrix(object):
         c.get_ps()
         c.alloc_core()
         # Actually copy the data
-        for i in xrange(c.d):
+        for i in range(c.d):
             cur_core1 = _np.zeros((c.r[i], c.n[i], c.r[i + 1]))
             cur_core = self.tt.core[self.tt.ps[i] - 1:self.tt.ps[i + 1] - 1]
             cur_core = cur_core.reshape(
                 c.r[i], self.n[i], self.m[i], c.r[
                     i + 1], order='F')
-            for j in xrange(c.n[i]):
+            for j in range(c.n[i]):
                 cur_core1[:, j, :] = cur_core[:, j, j, :]
                 c.core[c.ps[i] - 1:c.ps[i + 1] - 1] = cur_core1.flatten('F')
         return c
@@ -358,7 +358,7 @@ class matrix(object):
         prm = prm.flatten('F')
         # Get the inverse permutation
         iprm = [0] * (2 * d)
-        for i in xrange(2 * d):
+        for i in range(2 * d):
             iprm[prm[i]] = i
         a = a.transpose(iprm).reshape(N, M, order='F')
         a = a.reshape(N, M)

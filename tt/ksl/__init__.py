@@ -1,1 +1,1 @@
-from ksl import *
+from .ksl import *

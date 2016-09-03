@@ -4,7 +4,7 @@ import copy
 import numpy as np
 import tt
 from copy import deepcopy
-import riemannian
+from . import riemannian
 
 
 class TestTTLearning(unittest.TestCase):

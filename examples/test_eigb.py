@@ -22,5 +22,5 @@ t = time.time()
 y, lam = eigb(A, x, 1e-6)
 
 t1 = time.time()
-print 'Eigenvalues:', lam
-print 'Time is:', t1-t
+print('Eigenvalues:', lam)
+print('Time is:', t1-t)

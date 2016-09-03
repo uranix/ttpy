@@ -33,8 +33,8 @@ class fun_qtt: #Only QTT is assumed, i.e. d is an array [d1,d2,d3,...,]
         self.full_sz = np.array([2]*self.d.sum(),dtype=np.int32)
         self.order = order
         start=0
-        for i in xrange(self.m):
-            for j in xrange(self.d[i]):
+        for i in range(self.m):
+            for j in range(self.d[i]):
                 self.sm[i,j+start]=2**(j)
             start = start + self.d[i]
         # ind_tt1 = (i1) + (i2-1)*2 + (i3-1)*4 + ...

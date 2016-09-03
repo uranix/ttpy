@@ -4,7 +4,7 @@
     url = https://github.com/oseledets/tt-fort.git
 [submodule "tt/cross/rectcross"]
 	path = tt/cross/rectcross
-	url = https://bitbucket.org/oseledets/rectcross
+	url = https://bitbucket.org/uranix/rectcross
 [submodule "tt/utils/rect_maxvol"]
 	path = tt/utils/rect_maxvol
-	url = https://bitbucket.org/muxas/rect_maxvol
+	url = https://bitbucket.org/uranix/rect_maxvol

@@ -44,7 +44,7 @@ def left(X, i):
         return np.ones([1, 1])
     answ = np.ones([1, 1])
     cores = tt.tensor.to_list(X)
-    for dim in xrange(i+1):
+    for dim in range(i+1):
         answ = np.tensordot(answ, cores[dim], 1)
     answ = reshape(answ, (-1, X.r[i+1]))
     return answ
@@ -56,7 +56,7 @@ def right(X, i):
         return np.ones([1, 1])
     answ = np.ones([1, 1])
     cores = tt.tensor.to_list(X)
-    for dim in xrange(X.d-1, i-1, -1):
+    for dim in range(X.d-1, i-1, -1):
         answ = np.tensordot(cores[dim], answ, 1)
     answ = reshape(answ, (X.r[i], -1))
     return answ.T
@@ -132,7 +132,7 @@ def project(X, Z, use_jit=False, debug=False):
     numDims, modeSize = X.d, X.n
     coresX = tt.tensor.to_list(X)
     coresZ = [None] * len(zArr)
-    for idx in xrange(len(zArr)):
+    for idx in range(len(zArr)):
         assert(modeSize == zArr[idx].n).all()
         coresZ[idx] = tt.tensor.to_list(zArr[idx])
 
@@ -140,9 +140,9 @@ def project(X, Z, use_jit=False, debug=False):
         print('Consider using use_jit=True option to speed up the projection '
               'process.')
     if use_jit:
-        for dim in xrange(numDims):
+        for dim in range(numDims):
             r1, n, r2 = coresZ[0][dim].shape
-            for idx in xrange(len(zArr)):
+            for idx in range(len(zArr)):
                 if (r1, n, r2) != coresZ[idx][dim].shape:
                     print('Warning: cannot use the jit version when not all '
                           'the ranks in the Z array are equal each other. '
@@ -151,10 +151,10 @@ def project(X, Z, use_jit=False, debug=False):
 
     if use_jit:
         zCoresDim = [None] * numDims
-        for dim in xrange(numDims):
+        for dim in range(numDims):
             r1, n, r2 = coresZ[0][dim].shape
             zCoresDim[dim] = np.zeros([len(zArr), r1, n, r2])
-            for idx in xrange(len(zArr)):
+            for idx in range(len(zArr)):
                 if (r1, n, r2) != coresZ[idx][dim].shape:
                     print('Warning: cannot use the jit version when not all '
                           'the ranks in the Z array are equal each other. '
@@ -163,7 +163,7 @@ def project(X, Z, use_jit=False, debug=False):
                 zCoresDim[dim][idx, :, :, :] = coresZ[idx][dim]
         # Initialize the cores of the projection_X(sum z[i]).
         coresP = []
-        for dim in xrange(numDims):
+        for dim in range(numDims):
             r1 = 2 * X.r[dim]
             r2 = 2 * X.r[dim+1]
             if dim == 0:
@@ -173,21 +173,21 @@ def project(X, Z, use_jit=False, debug=False):
             coresP.append(np.zeros((r1, modeSize[dim], r2)))
         # rhs[dim] is a len(zArr) x zArr[idx] x X.rank_dim.rank_dim ndarray.
         # Right to left orthogonalization of X and preparation of the rhs vectors.
-        for dim in xrange(numDims-1, 0, -1):
+        for dim in range(numDims-1, 0, -1):
             # Right to left orthogonalization of the X cores.
             coresX = cores_orthogonalization_step(coresX, dim, left_to_right=False)
             r1, n, r2 = coresX[dim].shape
 
             # Fill the right orthogonal part of the projection.
-            for value in xrange(modeSize[dim]):
+            for value in range(modeSize[dim]):
                 coresP[dim][0:r1, value, 0:r2] = coresX[dim][:, value, :]
 
         rhs = [None] * (numDims+1)
-        for dim in xrange(numDims):
+        for dim in range(numDims):
             rhs[dim] = np.zeros([len(zArr), zArr[idx].r[dim], coresX[dim].shape[0]])
         rhs[numDims] = np.ones([len(zArr), 1, 1])
 
-        for dim in xrange(numDims-1, 0, -1):
+        for dim in range(numDims-1, 0, -1):
             _update_rhs(rhs[dim+1], coresX[dim], zCoresDim[dim], rhs[dim])
 
         if debug:
@@ -196,7 +196,7 @@ def project(X, Z, use_jit=False, debug=False):
         # lsh is a len(zArr) x X.rank_dim x zArr[idx].rank_dim ndarray.
         lhs = np.ones([len(zArr), 1, 1])
         # Left to right sweep.
-        for dim in xrange(numDims):
+        for dim in range(numDims):
             cc = coresX[dim].copy()
             r1, n, r2 = cc.shape
             if dim < numDims-1:
@@ -230,7 +230,7 @@ def project(X, Z, use_jit=False, debug=False):
                     coresP[dim][r1:, :, 0:r2] += currPCore
                 if debug:
                     explicit_sum = np.zeros((r1, modeSize[dim], r2))
-                    for idx in xrange(len(zArr)):
+                    for idx in range(len(zArr)):
                         leftQm1 = left(tt.tensor.from_list(coresX), dim-1)
                         leftQ = left(tt.tensor.from_list(coresX), dim)
 
@@ -261,7 +261,7 @@ def project(X, Z, use_jit=False, debug=False):
         # Non-jit version of the code.
         # Initialize the cores of the projection_X(sum z[i]).
         coresP = []
-        for dim in xrange(numDims):
+        for dim in range(numDims):
             r1 = 2 * X.r[dim]
             r2 = 2 * X.r[dim+1]
             if dim == 0:
@@ -270,11 +270,11 @@ def project(X, Z, use_jit=False, debug=False):
                 r2 = 1
             coresP.append(np.zeros((r1, modeSize[dim], r2)))
         # rhs[idx][dim] is an (Z.rank_dim * X.rank_dim) x 1 vector
-        rhs = [[0] * (numDims+1) for _ in xrange(len(zArr))]
-        for idx in xrange(len(zArr)):
+        rhs = [[0] * (numDims+1) for _ in range(len(zArr))]
+        for idx in range(len(zArr)):
             rhs[idx][numDims] = np.ones([1, 1])
         # Right to left sweep to orthogonalize the cores and prepare rhs.
-        for dim in xrange(numDims-1, 0, -1):
+        for dim in range(numDims-1, 0, -1):
             # Right to left orthogonalization of the X cores.
             coresX = cores_orthogonalization_step(coresX, dim, left_to_right=False)
             r1, n, r2 = coresX[dim].shape
@@ -282,7 +282,7 @@ def project(X, Z, use_jit=False, debug=False):
             # Fill the right orthogonal part of the projection.
             coresP[dim][0:r1, :, 0:r2] = coresX[dim]
             # Compute rhs.
-            for idx in xrange(len(zArr)):
+            for idx in range(len(zArr)):
                 coreProd = np.tensordot(coresZ[idx][dim], coresX[dim], axes=(1, 1))
                 coreProd = np.transpose(coreProd, (0, 2, 1, 3))
                 coreProd = reshape(coreProd, (zArr[idx].r[dim]*r1, zArr[idx].r[dim+1]*r2))
@@ -291,9 +291,9 @@ def project(X, Z, use_jit=False, debug=False):
             assert(np.allclose(X.full(), tt.tensor.from_list(coresX).full()))
 
         # lsh[idx] is an X.rank_dim x zArr[idx].rank_dim matrix.
-        lhs = [np.ones([1, 1]) for _ in xrange(len(zArr))]
+        lhs = [np.ones([1, 1]) for _ in range(len(zArr))]
         # Left to right sweep.
-        for dim in xrange(numDims - 1):
+        for dim in range(numDims - 1):
             if debug:
                 rightQ = right(tt.tensor.from_list(coresX), dim+1)
             # Left to right orthogonalization of the X cores.
@@ -301,7 +301,7 @@ def project(X, Z, use_jit=False, debug=False):
             r1, n, r2 = coresX[dim].shape
             cc = reshape(coresX[dim], (-1, r2))
 
-            for idx in xrange(len(zArr)):
+            for idx in range(len(zArr)):
                 currZCore = reshape(coresZ[idx][dim], (zArr[idx].r[dim], -1))
                 currPCore = np.dot(lhs[idx], currZCore)
 
@@ -343,7 +343,7 @@ def project(X, Z, use_jit=False, debug=False):
             else:
                 coresP[dim][r1:, :, r2:] = coresX[dim]
 
-        for idx in xrange(len(zArr)):
+        for idx in range(len(zArr)):
             r1, n, r2 = coresX[numDims-1].shape
             currZCore = reshape(coresZ[idx][numDims-1], (zArr[idx].r[numDims-1], -1))
             currPCore = np.dot(lhs[idx], currZCore)
@@ -373,7 +373,7 @@ def projector_splitting_add(Y, delta, debug=False):
     rhs = [None] * (numDims+1)
     rhs[numDims] = np.ones([1, 1])
     # Right to left sweep to orthogonalize the cores and prepare the rhs.
-    for dim in xrange(numDims-1, 0, -1):
+    for dim in range(numDims-1, 0, -1):
         # Right to left orthogonalization of the Y cores.
         coresY = cores_orthogonalization_step(coresY, dim, left_to_right=False)
         r1, n, r2 = coresY[dim].shape
@@ -391,7 +391,7 @@ def projector_splitting_add(Y, delta, debug=False):
     # s is an Y.rank_dim x Y.rank_dim matrix.
     s = np.ones([1, 1])
     # Left to right projector splitting sweep.
-    for dim in xrange(numDims):
+    for dim in range(numDims):
         # Y^+ (formula 4.10)
         cc = coresDelta[dim].copy()
         r1, n, r2 = coresY[dim].shape

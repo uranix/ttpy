@@ -35,7 +35,7 @@ def multifuncrs2(X, funs, eps=1e-6,
                  restart_it=0):
 
     dtype = np.float64
-    if len(filter(lambda x: x.is_complex, X)) > 0:
+    if len([x for x in X if x.is_complex]) > 0:
         dtype = np.complex128
 
     if eps_exit is None:
@@ -176,7 +176,7 @@ def multifuncrs2(X, funs, eps=1e-6,
         try:
             dy = np.linalg.norm(newy - oldy) / np.linalg.norm(newy)
         except ZeroDivisionError:
-            print 'Bad initial indices, the solution is exactly zero. Restarting'
+            print('Bad initial indices, the solution is exactly zero. Restarting')
             return
         max_dy = max(max_dy, dy)
         # truncation
@@ -214,7 +214,7 @@ def multifuncrs2(X, funs, eps=1e-6,
                 r = u.shape[1]
                 s = np.ones((r, ))
         if verb > 1:
-            print '=multifuncrs2=   block %d{%d}, dy: %3.3e, r: %d' % (i, dirn, dy, r)
+            print('=multifuncrs2=   block %d{%d}, dy: %3.3e, r: %d' % (i, dirn, dy, r))
         #Kicks and interfaces
         if dirn > 0 and i < d - 1:
             u = u[:, :r]
@@ -226,7 +226,7 @@ def multifuncrs2(X, funs, eps=1e-6,
                 # Compute the function at residual indices
                 curbl_y = np.zeros((ry[i] * n[i] * rz[i + 1], nx), dtype=dtype)
                 curbl_z = np.zeros((rz[i] * n[i] * rz[i + 1], nx), dtype=dtype)
-                for j in xrange(nx):
+                for j in range(nx):
                     # For kick
                     cr = reshape(crx[i, j], (rx[i, j], n[i] * rx[i + 1, j]))
                     cr = np.dot(Rx[i, j], cr)
@@ -308,7 +308,7 @@ def multifuncrs2(X, funs, eps=1e-6,
             curind = maxvol(Ry[i + 1])
             Ry[i + 1] = Ry[i + 1][curind, :]
             # Interface matrices for X
-            for j in xrange(nx):
+            for j in range(nx):
                 Rx[i + 1, j] = reshape(crx[i, j],
                                        (rx[i, j], n[i] * rx[i + 1, j]))
                 Rx[i + 1, j] = np.dot(Rx[i, j], Rx[i + 1, j])
@@ -327,7 +327,7 @@ def multifuncrs2(X, funs, eps=1e-6,
                 Ryz[i + 1] = Ryz[i + 1][curind, :]
                 Rz[i + 1] = Rz[i + 1][curind, :]
                 # Interface matrices for X
-                for j in xrange(nx):
+                for j in range(nx):
                     Rxz[i + 1, j] = reshape(crx[i, j],
                                             (rx[i, j], n[i] * rx[i + 1, j]))
                     Rxz[i + 1, j] = np.dot(Rxz[i, j], Rxz[i + 1, j])
@@ -345,7 +345,7 @@ def multifuncrs2(X, funs, eps=1e-6,
                 # Compute the function at residual indices
                 curbl_y = np.zeros((rz[i] * n[i] * ry[i + 1], nx), dtype=dtype)
                 curbl_z = np.zeros((rz[i] * n[i] * rz[i + 1], nx), dtype=dtype)
-                for j in xrange(nx):
+                for j in range(nx):
                     cr = reshape(crx[i, j], (rx[i, j], n[i] * rx[i + 1, j]))
                     cr = np.dot(Rxz[i, j], cr)
                     cr = reshape(cr, (rz[i] * n[i], rx[i + 1, j]))
@@ -428,7 +428,7 @@ def multifuncrs2(X, funs, eps=1e-6,
             curind = maxvol(Ry[i].T)
             Ry[i] = Ry[i][:, curind]
             # Interface matrices for X
-            for j in xrange(nx):
+            for j in range(nx):
                 Rx[i, j] = reshape(crx[i, j], (rx[i, j] * n[i], rx[i + 1, j]))
                 Rx[i, j] = np.dot(Rx[i, j], Rx[i + 1, j])
                 Rx[i, j] = reshape(Rx[i, j], (rx[i, j], n[i] * ry[i + 1]))
@@ -445,7 +445,7 @@ def multifuncrs2(X, funs, eps=1e-6,
                 Ryz[i] = Ryz[i][:, curind]
                 Rz[i] = Rz[i][:, curind]
                 # Interface matrices for X
-                for j in xrange(nx):
+                for j in range(nx):
                     Rxz[i, j] = reshape(
                         crx[i, j], (rx[i, j] * n[i], rx[i + 1, j]))
                     Rxz[i, j] = np.dot(Rxz[i, j], Rxz[i + 1, j])
@@ -470,8 +470,8 @@ def multifuncrs2(X, funs, eps=1e-6,
         if cur_order[order_index] == 0:
             order_index = order_index + 1
             if verb > 0:
-                print '=multifuncrs= sweep %d{%d}, max_dy: %3.3e, erank: %g' % (swp, order_index, max_dy,
-                                                                                math.sqrt(np.dot(ry[:d], n * ry[1:]) / np.sum(n)))
+                print('=multifuncrs= sweep %d{%d}, max_dy: %3.3e, erank: %g' % (swp, order_index, max_dy,
+                                                                                math.sqrt(np.dot(ry[:d], n * ry[1:]) / np.sum(n))))
             if max_dy < eps_exit and dirn > 0:
                 break
             if order_index >= len(cur_order):  # New global sweep

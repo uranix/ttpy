@@ -1,14 +1,14 @@
 import numpy as _np
 import math as _math
 import copy as _cp
-import tt_f90 as _tt_f90
+from . import tt_f90 as _tt_f90
 
-import vector as _vector
-import matrix as _matrix
+from . import vector as _vector
+from . import matrix as _matrix
 
-from utils import ind2sub as _ind2sub
-from utils import gcd as _gcd
-from utils import my_chop2 as _my_chop2
+from .utils import ind2sub as _ind2sub
+from .utils import gcd as _gcd
+from .utils import my_chop2 as _my_chop2
 
 # Some binary operations (put aside to wrap something in future)
 # TT-matrix by a TT-vector product
@@ -46,7 +46,7 @@ def matvec(a, b, compression=False):
         # calculate norm of resulting _vector first
         nrm = _np.array([[1.0]])  # 1 x 1
         v = _np.array([[1.0]])
-        for i in xrange(d):
+        for i in range(d):
             ccr = get_core(i)
             #print(str(ccr.shape) + " -> "),
             # minimal loss compression
@@ -74,7 +74,7 @@ def matvec(a, b, compression=False):
         compression = compression * nrm / _np.sqrt(d - 1)
         v = _np.array([[1.0]])
 
-    for i in xrange(d):
+    for i in range(d):
         ccr = get_core(i)
         rl, n, rr = ccr.shape
         if compression:
@@ -94,7 +94,7 @@ def matvec(a, b, compression=False):
     result = _vector.vector.from_list(ccrs)
     if compression:
         # print result
-        print "Norm actual:", result.norm(), " mean rank:", result.rmean()
+        print("Norm actual:", result.norm(), " mean rank:", result.rmean())
         # print "Norm very actual:", matvec(a,b).norm()
     return result
 
@@ -203,7 +203,7 @@ def sum(a, axis=-1):
     d = a.d
     crs = _vector.vector.to_list(a.tt if isinstance(a, _matrix.matrix) else a)
     if axis < 0:
-        axis = range(a.d)
+        axis = list(range(a.d))
     elif isinstance(axis, int):
         axis = [axis]
     axis = list(axis)[::-1]
@@ -276,7 +276,7 @@ def eye(n, d=None):
     c.tt.r = _np.ones((c.tt.d + 1,), dtype=_np.int32)
     c.tt.get_ps()
     c.tt.alloc_core()
-    for i in xrange(c.tt.d):
+    for i in range(c.tt.d):
         c.tt.core[
             c.tt.ps[i] -
             1:c.tt.ps[
@@ -392,7 +392,7 @@ def Toeplitz(x, d=None, D=None, kind='F'):
     crs = []
     xcrs = _vector.vector.to_list(x)
     dp = 0  # dimensions passed
-    for j in xrange(D):
+    for j in range(D):
         currd = d[j]
         xcr = xcrs[dp]
         cr = _np.tensordot(V, xcr, (0, 1))
@@ -401,7 +401,7 @@ def Toeplitz(x, d=None, D=None, kind='F'):
                         order='F')  # <r_dp| x 2 x 2 x |2r_{dp+1}>
         dp += 1
         crs.append(cr)
-        for i in xrange(1, currd - 1):
+        for i in range(1, currd - 1):
             xcr = xcrs[dp]
             # (<2| x 2 x 2 x |2>) x <r_dp| x |r_{dp+1}>
             cr = _np.tensordot(W, xcr, (1, 1))
@@ -457,7 +457,7 @@ def qlaplace_dd(d):
     J = _np.array([[0, 1], [0, 0]])
     cr = []
     if D is 1:
-        for k in xrange(1, d0[0] + 1):
+        for k in range(1, d0[0] + 1):
             if k is 1:
                 cur_core = _np.zeros((1, 2, 2, 3))
                 cur_core[:, :, :, 0] = 2 * I - J - J.T
@@ -477,8 +477,8 @@ def qlaplace_dd(d):
                 cur_core[2, :, :, 0] = J
             cr.append(cur_core)
     else:
-        for k in xrange(D):
-            for kappa in xrange(1, d0[k] + 1):
+        for k in range(D):
+            for kappa in range(1, d0[k] + 1):
                 if kappa is 1:
                     if k is 0:
                         cur_core = _np.zeros((1, 2, 2, 4))
@@ -538,7 +538,7 @@ def xfun(n, d=None):
         tt.xfun(3)            # create [0, 1, 2] one-dimensional TT-vector
         tt.xfun([3, 5, 7], 2) # create 3 x 5 x 7 x 3 x 5 x 7 TT-vector
     """
-    if isinstance(n, (int, long)):
+    if isinstance(n, int):
         n = [n]
     if d is None:
         n0 = _np.asanyarray(n, dtype=_np.int32)
@@ -553,9 +553,9 @@ def xfun(n, d=None):
     cur_core[0, :, 0] = _np.arange(n0[0])
     cr.append(cur_core)
     ni = float(n0[0])
-    for i in xrange(1, d - 1):
+    for i in range(1, d - 1):
         cur_core = _np.zeros((2, n0[i], 2))
-        for j in xrange(n0[i]):
+        for j in range(n0[i]):
             cur_core[:, j, :] = _np.eye(2)
         cur_core[1, :, 0] = ni * _np.arange(n0[i])
         ni *= n0[i]
@@ -568,7 +568,7 @@ def xfun(n, d=None):
 
 def linspace(n, d=None, a=0.0, b=1.0, right=True, left=True):
     """ Create a QTT-representation of a uniform grid on an interval [a, b] """
-    if isinstance(n, (int, long)):
+    if isinstance(n, int):
         n = [n]
     if d is None:
         n0 = _np.asanyarray(n, dtype=_np.int32)
@@ -600,7 +600,7 @@ def sin(d, alpha=1.0, phase=0.0):
     cur_core[0, 0, :] = [_math.cos(phase), _math.sin(phase)]
     cur_core[0, 1, :] = [_math.cos(alpha + phase), _math.sin(alpha + phase)]
     cr.append(cur_core)
-    for i in xrange(1, d - 1):
+    for i in range(1, d - 1):
         cur_core = _np.zeros([2, 2, 2], dtype=_np.float)
         cur_core[0, 0, :] = [1.0, 0.0]
         cur_core[1, 0, :] = [0.0, 1.0]
@@ -633,7 +633,7 @@ def cos(d, alpha=1.0, phase=0.0):
 
 def delta(n, d=None, center=0):
     """ Create TT-vector for delta-function :math:`\\delta(x - x_0)`. """
-    if isinstance(n, (int, long)):
+    if isinstance(n, int):
         n = [n]
     if d is None:
         n0 = _np.asanyarray(n, dtype=_np.int32)
@@ -645,13 +645,13 @@ def delta(n, d=None, center=0):
         cind = [0] * d
     else:
         cind = []
-        for i in xrange(d):
+        for i in range(d):
             cind.append(center % n0[i])
             center /= n0[i]
         if center > 0:
             cind = [0] * d
     cr = []
-    for i in xrange(d):
+    for i in range(d):
         cur_core = _np.zeros((1, n0[i], 1))
         cur_core[0, cind[i], 0] = 1
         cr.append(cur_core)
@@ -668,7 +668,7 @@ def stepfun(n, d=None, center=1, direction=1):
         \chi(x) = \\left\{ \\begin{array}{l} 1 \mbox{ when } x \ge 0, \\\\ 0 \mbox{ when } x < 0. \\end{array} \\right.
 
     For negative value of ``direction`` :math:`\chi(x_0 - x)` is approximated. """
-    if isinstance(n, (int, long)):
+    if isinstance(n, int):
         n = [n]
     if d is None:
         n0 = _np.asanyarray(n, dtype=_np.int32)
@@ -686,7 +686,7 @@ def stepfun(n, d=None, center=1, direction=1):
     if direction > 0:
         center = N - center
     cind = []
-    for i in xrange(d):
+    for i in range(d):
         cind.append(center % n0[i])
         center /= n0[i]
 
@@ -756,7 +756,7 @@ def stepfun(n, d=None, center=1, direction=1):
 def qshift(d):
     x = []
     x.append(_np.array([0.0, 1.0]).reshape((1, 2, 1)))
-    for _ in xrange(1, d):
+    for _ in range(1, d):
         x.append(_np.array([1.0, 0.0]).reshape((1, 2, 1)))
     return Toeplitz(_vector.vector.from_list(x), kind='L')
 
@@ -783,7 +783,7 @@ def unit(n, d=None, j=None, tt_instance=True):
 
     j = _ind2sub(n, j)
 
-    for k in xrange(d):
+    for k in range(d):
         rv.append(_np.zeros((1, n[k], 1)))
         rv[-1][0, j[k], 0] = 1
     if tt_instance:
@@ -809,7 +809,7 @@ def IpaS(d, a, tt_instance=True):
         M[0] = _np.zeros((1, 2, 2, 2))
         M[0][0, :, :, 0] = _np.array([[1, 0], [a, 1]])
         M[0][0, :, :, 1] = _np.array([[0, a], [0, 0]])
-        for i in xrange(1, d - 1):
+        for i in range(1, d - 1):
             M[i] = _np.zeros((2, 2, 2, 2))
             M[i][:, :, 0, 0] = _np.eye(2)
             M[i][:, :, 1, 0] = _np.array([[0, 0], [1, 0]])
@@ -890,7 +890,7 @@ def reshape(tt_array, shape, eps=1e-14, rl=1, rr=1):
     if d2 <= d1:
         i2 = 0
         n2 = _cp.deepcopy(sz)
-        for i1 in xrange(d1):
+        for i1 in range(d1):
             if n2[i2] == 1:
                 i2 = i2 + 1
                 if i2 > d2:
@@ -905,7 +905,7 @@ def reshape(tt_array, shape, eps=1e-14, rl=1, rr=1):
     tt1 = tt1.to_list(tt1)
 
     if needQRs:  # We have to split some cores -> perform QRs
-        for i in xrange(d1 - 1, 0, -1):
+        for i in range(d1 - 1, 0, -1):
             cr = tt1[i]
             cr = _np.reshape(cr, (r1[i], n1[i] * r1[i + 1]), order='F')
             [cr, rv] = _np.linalg.qr(cr.T)  # Size n*r2, r1new - r1nwe,r1

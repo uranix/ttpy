@@ -1,9 +1,9 @@
 import numpy as _np
 from numbers import Number as _Number
-import tt_f90 as _tt_f90
+from . import tt_f90 as _tt_f90
 import warnings
 
-import matrix as _matrix
+from . import matrix as _matrix
 
 # The main class for working with vectors in the TT-format
 
@@ -95,7 +95,7 @@ class vector(object):
         n = _np.zeros(d, dtype=_np.int32)
         r = _np.zeros(d+1, dtype=_np.int32)
         cr = _np.array([])
-        for i in xrange(d):
+        for i in range(d):
             cr = _np.concatenate((cr, a[i].flatten(order)))
             r[i] = a[i].shape[0]
             r[i+1] = a[i].shape[2]
@@ -120,7 +120,7 @@ class vector(object):
         ps = tt.ps
         core = tt.core
         res = []
-        for i in xrange(d):
+        for i in range(d):
             cur_core = core[ps[i] - 1:ps[i + 1] - 1]
             cur_core = cur_core.reshape((r[i], n[i], r[i + 1]), order='F')
             res.append(cur_core)
@@ -166,7 +166,7 @@ class vector(object):
         # than the old one.
         running_fact = None
         answ_cores = []
-        for i in xrange(self.d):
+        for i in range(self.d):
             # r0, n, r1 = cores[i].shape
             cur_core = self.core[self.ps[i] - 1:self.ps[i + 1] - 1]
             cur_core = cur_core.reshape(
@@ -208,7 +208,7 @@ class vector(object):
         newcr[:, :, :rr] = _np.real(cr)
         newcr[:, :, rr:] = _np.imag(cr)
         newcrs.append(newcr)
-        for i in xrange(1, self.d - 1):
+        for i in range(1, self.d - 1):
             cr = crs[i]
             rl, n, rr = cr.shape
             newcr = _np.zeros((rl * 2, n, rr * 2), dtype=_np.float)
@@ -528,11 +528,11 @@ class vector(object):
         n = self.n
         res = []
         dtype = self.core.dtype
-        for i in xrange(d):
+        for i in range(d):
             cur_core = cl[i]
             res_core = _np.zeros((r[i], n[i], n[i], r[i + 1]), dtype=dtype)
-            for s1 in xrange(r[i]):
-                for s2 in xrange(r[i + 1]):
+            for s1 in range(r[i]):
+                for s2 in range(r[i + 1]):
                     res_core[
                         s1, :, :, s2] = _np.diag(
                         cur_core[

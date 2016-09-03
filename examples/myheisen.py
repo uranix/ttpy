@@ -8,9 +8,9 @@ import time
 """ Compute minimal eigenvalues for the Heisenberg model """
 def gen_1d(mat,e,i,d):
     w = mat
-    for j in xrange(i):
+    for j in range(i):
         w = tt.kron(e,w)
-    for j in xrange(d-i-1):
+    for j in range(d-i-1):
         w = tt.kron(w,e)
     return w
 
@@ -29,11 +29,11 @@ def gen_heisen(d):
     sm = tt.matrix(sm,1e-12)
     e = tt.matrix(e,1e-12)
     #Generate ssx, ssz
-    ssp = [gen_1d(sp,e,i,d) for i in xrange(d)]
-    ssz = [gen_1d(sz,e,i,d) for i in xrange(d)]
-    ssm = [gen_1d(sm,e,i,d) for i in xrange(d)]
+    ssp = [gen_1d(sp,e,i,d) for i in range(d)]
+    ssz = [gen_1d(sz,e,i,d) for i in range(d)]
+    ssm = [gen_1d(sm,e,i,d) for i in range(d)]
     A = None
-    for i in xrange(d-1):
+    for i in range(d-1):
         A = A + 0.5 * (ssp[i] * ssm[i+1] + ssm[i] * ssp[i+1]) +  (ssz[i] * ssz[i+1])
         A = A.round(1e-8)
     return A
@@ -52,8 +52,8 @@ if __name__ == '__main__':
     r[d] = B
     x0 = tt.rand(n,d,r)
     t1 = time.time()
-    print 'Matrices are done'
+    print('Matrices are done')
     y, lam = eigb(A, x0, eps, max_full_size = 1000)
     t2 = time.time()
-    print 'Elapsed time: %3.1f' % (t2 - t1)
-    print 'Eigenvalues: ', lam
+    print('Elapsed time: %3.1f' % (t2 - t1))
+    print('Eigenvalues: ', lam)

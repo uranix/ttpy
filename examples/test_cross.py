@@ -21,5 +21,5 @@ sf = lambda x : np.sin(x) / x #Should be rank 2
 y = tt.multifuncrs([x], sf, 1e-6, ['y0', tt.ones(2, d)])
 #y1 = tt.tensor(sf(x.full()), 1e-8)
 
-print "pi / 2 ~ ", tt.dot(y, tt.ones(2, d)) * h
+print("pi / 2 ~ ", tt.dot(y, tt.ones(2, d)) * h)
 #print (y - y1).norm() / y.norm()

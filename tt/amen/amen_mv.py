@@ -112,7 +112,7 @@ def amen_mv(A, x, tol, y=None, z=None, nswp=20, kickrank=4,
     '''
 
     if renorm is 'gram':
-        print "Not implemented yet. Renorm is switched to 'direct'"
+        print("Not implemented yet. Renorm is switched to 'direct'")
         renorm = 'direct'
 
     if isinstance(x, _tt.vector):
@@ -125,7 +125,7 @@ def amen_mv(A, x, tol, y=None, z=None, nswp=20, kickrank=4,
         d = len(x)
         m = _np.zeros(d)
         rx = _np.ones(d + 1)
-        for i in xrange(d):
+        for i in range(d):
             [_, m[i], rx[i + 1]] = x[i].shape
         vectype = 0  # cell
     else:
@@ -136,13 +136,13 @@ def amen_mv(A, x, tol, y=None, z=None, nswp=20, kickrank=4,
         ra = A.tt.r
         A = _tt.matrix.to_list(A)
         # prepare A for fast ALS-mv
-        for i in xrange(d):
+        for i in range(d):
             A[i] = _reshape(A[i], (ra[i] * n[i], m[i] * ra[i + 1]))
         atype = 1  # tt_matrix
     # Alternative: A is a cell of cell: sparse canonical format
     elif isinstance(A, list):
         n = _np.zeros(d)
-        for i in xrange(d):
+        for i in range(d):
             n[i] = A[i][0].shape[0]
         ra = len(A[0])
         atype = 0  # cell
@@ -436,12 +436,12 @@ def amen_mv(A, x, tol, y=None, z=None, nswp=20, kickrank=4,
                     phizy[i + 1], z[i], y[i], 'rl', return_norm=False)
 
         if (verb > 1):
-            print 'amen-mv: swp=[%d,%d], dx=%.3e, r=%d, |y|=%.3e, |z|=%.3e' % (swp, i, dx, r, _np.linalg.norm(cry), nrmz)
+            print('amen-mv: swp=[%d,%d], dx=%.3e, r=%d, |y|=%.3e, |z|=%.3e' % (swp, i, dx, r, _np.linalg.norm(cry), nrmz))
 
         # Stopping or reversing
         if ((direct > 0) and (i == d - 1)) or ((direct < 0) and (i == 0)):
             if (verb > 0):
-                print 'amen-mv: swp=%d{%d}, max_dx=%.3e, max_r=%d' % (swp, (1 - direct) / 2, max_dx, max(ry))
+                print('amen-mv: swp=%d{%d}, max_dx=%.3e, max_r=%d' % (swp, (1 - direct) / 2, max_dx, max(ry)))
             if ((max_dx < tol) or (swp == nswp)) and (direct > 0):
                 break
             else:
@@ -462,7 +462,7 @@ def amen_mv(A, x, tol, y=None, z=None, nswp=20, kickrank=4,
     # Distribute norms equally...
     nrms = _np.exp(sum(_np.log(nrms)) / d)
     # ... and plug them into y
-    for i in xrange(d):
+    for i in range(d):
         y[i] = _np.dot(y[i], nrms)
 
     if (vectype == 1):
@@ -512,7 +512,7 @@ def _compute_next_Phi(Phi_prev, x, y, direction, A=None,
             # lr: Phi1
             x = _reshape(x, (rx1, n * rx2))
             y = _reshape(y, (ry1 * m, ry2))
-            for i in xrange(ra):
+            for i in range(ra):
                 Phi[i] = _np.dot(_tconj(x), Phi_prev[i])
                 Phi[i] = _reshape(Phi[i], (n, rx2 * ry1))
                 Phi[i] = Phi[i].T
@@ -525,7 +525,7 @@ def _compute_next_Phi(Phi_prev, x, y, direction, A=None,
             # rl: Phi2
             y = _reshape(y, (ry1, m * ry2))
             x = _reshape(x, (rx1 * n, rx2))
-            for i in xrange(ra):
+            for i in range(ra):
                 Phi[i] = _np.dot(Phi_prev[i], x.T)
                 Phi[i] = _reshape(Phi[i], (ry2 * rx1, n))
                 Phi[i] = _np.dot(Phi[i], A[i])
@@ -537,13 +537,13 @@ def _compute_next_Phi(Phi_prev, x, y, direction, A=None,
         if return_norm:
             # Extract the scale to prevent overload
             if (nrm > 0):
-                for i in xrange(ra):
+                for i in range(ra):
                     Phi[i] = Phi[i] / nrm
             else:
                 nrm = 1
         elif extnrm is not None:
             # Override the normalization
-            for i in xrange(ra):
+            for i in range(ra):
                 Phi[i] = Phi[i] / extnrm
     else:
         if (direction == 'lr'):
@@ -617,7 +617,7 @@ def _bfun3(Phi1, A, Phi2, x):
         [n, m] = A.shape
 
         y = _np.zeros((ry1 * n * ry2, b))
-        for i in xrange(ra):
+        for i in range(ra):
             cy = _reshape(x.T, (b * rx1 * m, rx2))
             cy = _np.dot(cy, Phi2[i])
             cy = _reshape(cy, (b * rx1, m * ry2))
@@ -668,7 +668,7 @@ if __name__ == '__main__':
     a = a + _tt.ones(n * m, d)
     #a = a.round(1e-12)
     a = _tt.vector.to_list(a)
-    for i in xrange(d):
+    for i in range(d):
         sa = a[i].shape
         a[i] = _reshape(a[i], (sa[0], m, n, sa[-1]))
     A = _tt.matrix.from_list(a)
@@ -679,4 +679,4 @@ if __name__ == '__main__':
                 kickrank2=0, verb=True, init_qr=True, renorm='gram', fkick=False)
     d = _tt.matvec(A, b).round(eps)
 
-    print (c[0] - d).norm() / d.norm()
+    print((c[0] - d).norm() / d.norm())
