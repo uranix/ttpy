@@ -36,9 +36,3 @@ class TestVector(unittest.TestCase):
         a = v.full().reshape(-1, order='F')
         b = np.arange(2**d)
         self.assertTrue(np.linalg.norm(a - b) < 1e-15, 'The approximation error is too large')
-    def test_diag(self):
-        d = 3
-        x = tt.xfun(2, d)
-        A = tt.diag(x).full()
-        B = np.diag(np.arange(2**d))
-        self.assertTrue(np.allclose(A, B))
