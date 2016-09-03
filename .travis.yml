@@ -6,7 +6,7 @@ cache: pip
 matrix:
   fast_finish: true
   include:
-    - python: "2.7"
+    - python: "3.4"
 addons:
   apt:
     packages:
