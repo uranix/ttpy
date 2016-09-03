@@ -145,10 +145,12 @@ def dot(a, b):
 def diag(a):
     """ Diagonal of a TT-matrix OR diagonal _matrix from a TT-vector."""
     if hasattr(a, '__diag__'):
-        return a.__diag__()
+        res = a.__diag__()
+        if isinstance(res, list):
+            res = _matrix.matrix.from_list(res)
+        return res
     else:
         raise ValueError('Can be called only on TT-vector or a TT-matrix')
-
 
 def mkron(a, *args):
     """Kronecker product of all the arguments"""
