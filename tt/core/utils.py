@@ -14,7 +14,7 @@ def ind2sub(siz, idx):
     Note: not vectorized.
     '''
     n = len(siz)
-    subs = _np.empty((n))
+    subs = _np.empty((n), dtype=int)
     k = _np.cumprod(siz[:-1])
     k = _np.concatenate((_np.ones(1), k))
     for i in range(n - 1, -1, -1):

@@ -1,4 +1,4 @@
-import amen_f90
+from . import amen_f90
 import tt
 from .amen_mv import amen_mv
 
